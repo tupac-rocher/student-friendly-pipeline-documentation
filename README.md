@@ -8,10 +8,14 @@
 ---
 
 ### Metrics
-#### Encapsulation
-#### Hierarchy
-#### Coupling
-#### Cohesion
+#### Class Level
+##### Encapsulation
+##### Hierarchy
+##### Coupling
+##### Cohesion
+#### Method Level
+##### Complexity
+
 ---
 ### Code Quality
 ---
