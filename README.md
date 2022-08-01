@@ -20,7 +20,7 @@
 | TCC | Cohesion | Description | - |
 
 #### Method Level
-| Metric | Category | Description | - |
+| Metric | Category | Description | Range | 
 | ------ | -------- | ----------- | - |
 | Total Line of Code (TLOC) | Other | Description | - |
 | Number of Parameters (NOP) | Other | Description | - |
