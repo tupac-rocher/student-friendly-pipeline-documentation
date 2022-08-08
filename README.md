@@ -120,7 +120,10 @@ Hierarchy
 
 ---
 
-## [Action and Pipeline explanation](https://github.com/tupac-rocher/mvn-format-xml-reports)
+## Action and Pipeline explanation
+ See Action and Pipeline explanation [here](https://github.com/tupac-rocher/mvn-student-friendly-report)
+ 
+ Files available on the current repository:
  - report.yml: the workflow configuration file to add to your Maven project 
  (path from the root of your project so it gets recognize by Github: ./.github/workflows)
  - checkstyle.xml: the configuration file for the checkstyle Maven plugin (to add to the root of your project)
