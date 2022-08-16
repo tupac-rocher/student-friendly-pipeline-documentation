@@ -120,7 +120,14 @@ This file is available at the same path on this repository.
 
 ## Feedback Report
 
+The feedback report provides insights upon the code quality of the project implemented the workflow. You will find insights about encapsulation, inheritance, coupling, cohesion among other aspects of Object Oriented Programming.
+
 ### Metrics
+
+Metrics are quantitave measures that give you insights upon different aspects of your code quality.
+The metric section is divided into 2 categories, class-level metrics and method-level metrics.
+
+
 #### Class Level
 | Metric | Category | Range | Description | Interpretation
 | ------ | -------- | ----------- | - | - |
