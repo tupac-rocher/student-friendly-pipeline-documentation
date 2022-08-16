@@ -1,6 +1,124 @@
 # Student-friendly pipeline documentation
 
-## Quality assessment tools
+This repository shows an example of a Github workflow that evaluates the quality of a Java project and reports:
+- [Design Metrics](#metrics)
+- [Code level style checks](#code-quality)
+- [Code smells](#code-smells)
+
+The workflow works by creating a report for pull request submitted to the repository. For example, see the [pull request in this repository](https://github.com/tupac-rocher/student-friendly-pipeline-example/pull/3).
+
+## Usage
+ 
+ In order to get this feedback report you need to add configurations to your Maven project:
+ - [Workflow configuration](#workflow-configuration): The workflow configuration file for Github Actions is report.yml
+ - [Maven configuration](#maven-configuration): Add 2 plugins to you pom.xml configuration file
+ - [Checkstyle configuration](#checkstyle-configuration): Add the Checkstyle configuration file for the Checkstyle Maven plugin from this repository: checkstyle.xml
+ 
+### **Workflow configuration**
+
+The report.yml file needs to be placed at this path from the root of your project so it gets recognized by Github: ./.github/workflows)
+
+This file is available at the same path on this repository.
+
+Here is the explanation of the report.yml file
+
+The pipeline is divided into 3 jobs:
+- [build](#build)
+- [upload-designite-artifact](#upload-designite-artifact)
+- [report](#report)
+
+---
+#### **build**
+**actions used**: actions/checkout@v3, actions/setup-java@v3
+
+**description**: 
+
+ 
+The purpose of this job is to allow the user to know directly if the code builds, tests pass and a package can be created before doing the other jobs.
+
+---
+#### **upload-designite-artifact**
+**actions used**: GuillaumeFalourd/clone-github-repo-action@v2, actions/upload-artifact@v3
+
+**description**:
+
+The purpose of this job is to upload the designite jar to execute the tool in the last job
+
+---
+#### **report**
+**actions used**: actions/checkout@v3, actions/setup-java@v3, actions/download-artifact@v3, robinraju/release-downloader@v1.4, montudor/action-zip@v1, tupac-rocher/mvn-student-friendly-report@v2.2, thollander/actions-comment-pull-request@v1
+
+**description**: 
+
+This job is the core of the pipeline. It will execute the Maven goals of the Maven plugins (jacoco-maven-plugin, maven-checkstyle-plugin) in order to generate the analytic files. 
+
+It will download the Designite exectuable artifact and execute it against the project to generate the analytic files.
+
+Regarding the metrics, to use CK it will clone its repository, since it is a Maven project it will install it, and finally execute its goal on the current project, this process is due to the way described by the CK README file to use the tool, eventually the analytic files are generated. 
+To use the JaSoMe tool, the process is to download the release, unzip it and execute it against the project to generate the analytic files.
+
+Now that all the files have been generated. The action corresponding to this repository will be used to aggregate and format the information into a single output that will represent a report in a Markdown formatted String variable.
+
+The Markdown formatted String is used with an action that will comment the pull request.
+
+### **Maven configuration**
+ 
+ 
+ Your project should include 2 Maven plugins in the build tag of the pom.xml file. 
+ 
+ You can refer to the pom.xml file on this repository.
+ Here is a look at the configuration of this pom.xml file:
+- jacoco-maven-plugin (verion: 0.8.7, group-id: org.jacoco)
+```xml
+<plugin>
+    <groupId>org.jacoco</groupId>
+    <artifactId>jacoco-maven-plugin</artifactId>
+    <version>0.8.7</version>
+    <executions>
+        <execution>
+            <id>prepare-agent</id>
+            <goals>
+                <goal>prepare-agent</goal>
+            </goals>
+        </execution>
+        <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+                <goal>report</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+The first goal, "prepare-agent", will prepare the JaCoCo runtime agent to record the execution data.<br>
+The second goal, "report", will use the execution data recorded to generate code coverage reports.<br>
+This second goal is tied to the "test" phase of the Maven lifecycle, this means that the goal will be trigger of the compilation of this phase.<br>
+The test coverage report can be found at target/site/jacoco/index.html.
+
+- maven-checkstyle-plugin (version: 3.1.2, group-id: org.apache.maven.plugins)
+
+```xml
+<plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-checkstyle-plugin</artifactId>
+      <version>3.1.2</version>
+      <configuration>
+        <configLocation>checkstyle.xml</configLocation>
+        <encoding>UTF-8</encoding>
+      </configuration>
+</plugin>
+```
+
+### **Checkstyle configuration**
+
+The checkstyle.xml needs to be placed at the root of your project.
+This file is available at the same path on this repository.
+
+---
+
+
+## Feedback Report
 
 ### Metrics
 #### Class Level
@@ -26,6 +144,10 @@
 
 ---
 ### Code Quality
+
+This list are all the issues selected to be reported by Checkstyle, a tool that automates the process of checking Java code. This selection is based on a paper that describes all Checkstyle code quality issues considered rekevant for computing undergraduates. See the reference below.<br>
+Oscar Karnalim, Simon, William Chivers, "Work-In-Progress: Code Quality Issues of Computing Undergraduates", [ref](https://ieeexplore.ieee.org/document/9766807)
+
 Code quality issues reported are split into 7 categories:
 
 - Naming
@@ -68,7 +190,7 @@ Code quality issues reported are split into 7 categories:
 ---
 ### Code Smells
 
-Code smells are warnings
+Code smells are code structures that may suggest a refactoring. They are only warnings and it is up to the developer to interpret and decide if a refactoring is necessary.
 
 You can check the definition of the Design smells at [https://www.designite-tools.com/faq/](https://www.designite-tools.com/faq/)
 
@@ -108,22 +230,14 @@ Hierarchy
 #### Implementation smells
 
 - Abstract Function Call From Constructor
-- Complex Conditional
-- Complex Method
-- Empty catch clause
-- Long Identifier
-- Long Method
-- Long Parameter List
-- Long Statement
+- [Complex Conditional](https://tusharma.in/smells/ICC.html)
+- [Complex Method](https://tusharma.in/smells/ICM.html)
+- [Empty catch clause](https://tusharma.in/smells/IECB.html)
+- [Long Identifier](https://tusharma.in/smells/ILI.html)
+- [Long Method](https://tusharma.in/smells/LM.html)
+- [Long Parameter List](https://tusharma.in/smells/LPL.html)
+- [Long Statement](https://tusharma.in/smells/ILS.html)
 - [Magic Number](https://tusharma.in/smells/IMN.html)
 - [Missing default](https://tusharma.in/smells/IMD.html)
 
 ---
-
-## Action and Pipeline explanation
- See Action and Pipeline explanation [here](https://github.com/tupac-rocher/mvn-student-friendly-report)
- 
- Files available on the current repository:
- - report.yml: the workflow configuration file to add to your Maven project 
- (path from the root of your project so it gets recognized by Github: ./.github/workflows)
- - checkstyle.xml: the configuration file for the checkstyle Maven plugin (to add to the root of your project)
